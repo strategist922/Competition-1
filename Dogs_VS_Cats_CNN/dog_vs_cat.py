@@ -81,10 +81,10 @@ test_set = test_datagen.flow_from_directory('dataset/test_set',
                                             batch_size = 32,
                                             class_mode = 'binary')
 
-model = create_model2()
-model = model.fit_generator(training_set,
+dog_vs_cat_model = create_model2()
+dog_vs_cat_model = dog_vs_cat_model.fit_generator(training_set,
                          steps_per_epoch = 8000,
-                         epochs = 1,
+                         epochs = 50,
                          validation_data = test_set,
                          validation_steps = 2000)
 
