@@ -12,6 +12,7 @@ from keras.layers import MaxPooling2D
 from keras.layers import Flatten
 from keras.layers import Dense
 from keras.layers import Dropout
+from keras.preprocessing.image import ImageDataGenerator
 
 
 
@@ -59,32 +60,44 @@ def create_model2():
     # Compiling the CNN
     model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
     return model
-
+    
+    
+    
+def save_model(model,model_name):    
+    model.save("Models/"+model_name+".h5")
+    print("Model saved to Model folder.")
 # Part 2 - Fitting the CNN to the images
 
-from keras.preprocessing.image import ImageDataGenerator
+def train_model():
 
-train_datagen = ImageDataGenerator(rescale = 1./255,
-                                   shear_range = 0.2,
-                                   zoom_range = 0.2,
-                                   horizontal_flip = True)
+    train_datagen = ImageDataGenerator(rescale = 1./255,
+                                       shear_range = 0.2,
+                                       zoom_range = 0.2,
+                                       horizontal_flip = True)
+    
+    test_datagen = ImageDataGenerator(rescale = 1./255)
+    
+    training_set = train_datagen.flow_from_directory('dataset/training_set',
+                                                     target_size = (64, 64),
+                                                     batch_size = 32,
+                                                     class_mode = 'binary')
+    
+    test_set = test_datagen.flow_from_directory('dataset/test_set',
+                                                target_size = (64, 64),
+                                                batch_size = 32,
+                                                class_mode = 'binary')
+    
+    dog_vs_cat_model = create_model2()
+    dog_vs_cat_model = dog_vs_cat_model.fit_generator(training_set,
+                             steps_per_epoch = 8000,
+                             epochs = 50,
+                             validation_data = test_set,
+                             validation_steps = 2000)
+    
+    return dog_vs_cat_model
 
-test_datagen = ImageDataGenerator(rescale = 1./255)
+dog_vs_cat_model = train_model()  
 
-training_set = train_datagen.flow_from_directory('dataset/training_set',
-                                                 target_size = (64, 64),
-                                                 batch_size = 32,
-                                                 class_mode = 'binary')
-
-test_set = test_datagen.flow_from_directory('dataset/test_set',
-                                            target_size = (64, 64),
-                                            batch_size = 32,
-                                            class_mode = 'binary')
-
-dog_vs_cat_model = create_model2()
-dog_vs_cat_model = dog_vs_cat_model.fit_generator(training_set,
-                         steps_per_epoch = 8000,
-                         epochs = 50,
-                         validation_data = test_set,
-                         validation_steps = 2000)
+save_model(dog_vs_cat_model,"CNN_Dog_vs_Cat_Model")
+    
 
