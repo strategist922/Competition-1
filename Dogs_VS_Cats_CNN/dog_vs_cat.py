@@ -13,8 +13,8 @@ from keras.layers import Flatten
 from keras.layers import Dense
 from keras.layers import Dropout
 from keras.preprocessing.image import ImageDataGenerator
-
-
+from keras.preprocessing.image import load_img, img_to_array
+import numpy as np
 
 def create_model():
     model = Sequential()
@@ -98,6 +98,17 @@ def train_model():
 
 dog_vs_cat_model = train_model()  
 
+
 save_model(dog_vs_cat_model,"CNN_Dog_vs_Cat_Model")
     
-
+def predict(self, test_data_folder, batch_size=32, verbose=1):
+    
+    predictions = []
+    for img_path in get_list_of_images(images_folder=test_data_folder):
+        image = load_img(join(test_data_folder, img_path))
+        x = img_to_array(image)
+        x = self.datagen.random_transform(x)
+        x = self.datagen.standardize(x)
+        prediction = self.model.predict_proba(np.array([x]), verbose=0)
+        predictions.append(prediction[0, 0])
+    return predictions
